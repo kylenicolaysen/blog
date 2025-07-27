@@ -9,3 +9,12 @@ body {
     color: rgb(200, 140, 182);
     padding: 2rem;
 }
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+ul {
+    list-style-type: none;
+}

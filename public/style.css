@@ -2,6 +2,16 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+img {
+    max-width: 50px;
+    max-height: 50px;
+}
+
+hr {
+    color: rgb(200, 140, 182);
 }
 
 body {
@@ -17,4 +27,18 @@ a {
 
 ul {
     list-style-type: none;
+}
+
+.header {
+    margin-bottom: 2rem;
+}
+
+.footer {
+    position: fixed;
+    bottom: 2rem;
+    width: 100%;
+}
+
+.footer_button {
+    display: block;
 }

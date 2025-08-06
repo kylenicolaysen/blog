@@ -1,51 +1,78 @@
-const express = require('express');
-const path = require('path');
-const fs = require('fs');
-const hbs = require('express-handlebars');
+const express = require('express')
+const hbs = require('express-handlebars')
+const db = require('./db')
+const path = require('path')
 
-const app = express();
-const PORT = 3000;
+const app = express()
+const PORT = 3000
 
-const POSTS_DIR = path.join(__dirname, 'posts');
+app.engine('handlebars', hbs.engine())
+app.set('view engine', 'handlebars')
+app.set('views', path.join(__dirname, 'views'))
 
-// Set up Handlebars
-app.engine('handlebars', hbs.engine());
-app.set('view engine', 'handlebars');
-app.set('views', path.join(__dirname, 'views'));
+app.use(express.static(path.join(__dirname, 'public')))
 
-// Serve static files
-app.use(express.static(path.join(__dirname, 'public')));
+// list all posts
+app.get('/', async (req, res) => {
+    try{
+        const db_result = await db.query('SELECT id, title, content FROM posts ORDER BY created_at DESC')
+        const posts = db_result.rows.map(post => ({
+            id: post.id,
+            title: post.title,
+            preview: post.content.split(' ').slice(0, 10).join(' ') + '...',
+        }))
+        res.render('home', { posts })
+    } catch (err) {
+        console.log(err)
+        res.status(500).send('Error loading posts.')
+    }
+})
 
-// Home page: List posts
-app.get('/', (req, res) => {
-  fs.readdir(POSTS_DIR, (err, files) => {
-    if (err) return res.status(500).send('Error reading posts');
+// single post
+app.get('/post/:id', async (req, res) => {
+    try {
+        const db_result = await db.query(`SELECT * FROM posts WHERE id = ${req.params.id};`)
+        const post = db_result.rows[0]
+        if (!post) {
+            return res.status(404).send('Post not found')
+        }
 
-    const posts = files
-      .filter(file => file.endsWith('.txt'))
-      .map(filename => {
-        const filepath = path.join(POSTS_DIR, filename);
-        const content = fs.readFileSync(filepath, 'utf8');
-        return {
-          slug: path.basename(filename, '.txt'),
-          preview: content.split(' ').slice(0, 10).join(' ') + '...',
-        };
-      });
+        res.render('post', {
+            id: post.id,
+            title: post.title,
+            content: post.content,
+            date: post.created_at,
+            logged_in: true
+        })
+    } catch (err) {
+        res.status(500).send('Error loading post.')
+    }
+})
 
-    res.render('home', { posts });
-  });
-});
-
-// Individual post page
-app.get('/post/:slug', (req, res) => {
-  const slug = req.params.slug;
-  const filepath = path.join(POSTS_DIR, slug + '.txt');
-
-  fs.readFile(filepath, 'utf8', (err, content) => {
-    if (err) return res.status(404).send('Post not found');
-    res.render('post', { title: slug, content });
-  });
-});
+app.get('/edit/:id', async (req, res) => {
+    try {
+        const db_result = await db.query(`SELECT * FROM posts WHERE id = ${req.params.id};`)
+        const post = db_result.rows[0]
+        if (!post) {
+            return res.status(404).send('Post not found.')
+        }
+        const logged_in = true
+        if (logged_in == true) {
+            res.render('edit', {
+                title: post.title,
+                content: post.content,
+                date: post.created_at,
+            })
+        }
+        else {
+            return res.status(401).redirect(`/post/${post.id}`)
+        }
+        
+    }catch (err) {
+        console.log(err)
+        res.status(500).send('Error loading post.')
+    }
+})
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);

@@ -1,9 +1,9 @@
-<h1>an old timey vlog</h1>
-<p>words</p>
+{{!-- <h1>Kyle Learns A Lot</h1>
+<p>A blog to document my journey through various hobby projects, including this site.</p> --}}
 <ul>
   {{#each posts}}
     <li>
-      <a href="/post/{{slug}}">{{preview}}</a>
+      <a href="/post/{{id}}""><h3>_{{title}}</h3><p>{{preview}}</p></a>
     </li>
   {{/each}}
 </ul>

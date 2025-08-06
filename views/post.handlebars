@@ -1,3 +1,10 @@
 <h1>{{title}}</h1>
-<p>{{content}}</p>
-<a href="/">_Back to Home</a>
+<p class="content">{{content}}</p>
+<div class="footer">
+    <a class="footer_button" href="/">_Home</a>
+    {{#if logged_in}}
+        <a class="footer_button" href="/edit/{{id}}">_Edit Post</a>
+    {{else}}
+        <a class="footer_button" href="/login">_Login</a>
+    {{/if}}
+</div>

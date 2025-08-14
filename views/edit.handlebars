@@ -1,5 +1,20 @@
-<h1>{{title}}</h1>
-<p>{{content}}</p>
+<form method="POST" action="/savepost/{{id}}">
+    <label><input type="text" name="title" id="title_input" value="{{title}}"></label>
+    <label><textarea type="text" name="content" id="content_input" rows="auto">{{content}}"</textarea></label>
+    <button id="save_button" class="edit_button">Save</button>
+</form>
+<a href="/post/{{id}}"><button id="cancel_button" class="edit_button">Cancel</button></a>
 <div class="footer">
     <a class="footer_button" href="/">_Home</a>
 </div>
+<script>
+    function autoResize(element) {
+        element.style.height = 'auto'
+        element.style.height = el.scrollHeight + 'px'
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+        const textarea = document.getElementById('content_input')
+        autoResize(textarea)
+        textarea.addEventListener('input', () => autoResize(textarea))
+    })
+</script>

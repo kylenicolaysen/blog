@@ -36,13 +36,14 @@ app.get('/post/:id', async (req, res) => {
         if (!post) {
             return res.status(404).send('Post not found')
         }
-
+        //Need to change this to auth middleware result
+        let logged_in = true
         res.render('post', {
             id: post.id,
             title: post.title,
             content: post.content,
             date: post.created_at,
-            logged_in: true
+            logged_in
         })
     } catch (err) {
         res.status(500).send('Error loading post.')
@@ -51,14 +52,16 @@ app.get('/post/:id', async (req, res) => {
 
 app.get('/edit/:id', async (req, res) => {
     try {
-        const db_result = await db.query(`SELECT * FROM posts WHERE id = ${req.params.id};`)
-        const post = db_result.rows[0]
-        if (!post) {
-            return res.status(404).send('Post not found.')
-        }
-        const logged_in = true
+        //Need to change this to auth middleware result
+        let logged_in = true
         if (logged_in == true) {
+            const db_result = await db.query(`SELECT * FROM posts WHERE id = ${req.params.id};`)
+            const post = db_result.rows[0]
+            if (!post) {
+                return res.status(404).send('Post not found.')
+            }
             res.render('edit', {
+                id: req.params.id,
                 title: post.title,
                 content: post.content,
                 date: post.created_at,
@@ -72,6 +75,15 @@ app.get('/edit/:id', async (req, res) => {
         console.log(err)
         res.status(500).send('Error loading post.')
     }
+})
+
+app.get('/login', (req, res) => {
+    return res.render('login')
+})
+
+app.post('/savepost/:id', async (req, res) => {
+    console.log(req)
+    return res.send(req)
 })
 
 app.listen(PORT, () => {

@@ -11,6 +11,7 @@ app.set('view engine', 'handlebars')
 app.set('views', path.join(__dirname, 'views'))
 
 app.use(express.static(path.join(__dirname, 'public')))
+app.use(express.urlencoded({ extended: true }))
 
 // list all posts
 app.get('/', async (req, res) => {
@@ -82,8 +83,14 @@ app.get('/login', (req, res) => {
 })
 
 app.post('/savepost/:id', async (req, res) => {
-    console.log(req)
-    return res.send(req)
+    const id = req.params.id
+    const { title, content } = req.body
+    try {
+        db.query(`UPDATE posts SET title = '${title}', content = '${content}' WHERE id = ${id};`)
+    } catch (e) {
+        console.error(e)
+    }
+    res.redirect(`/post/${id}`)
 })
 
 app.listen(PORT, () => {

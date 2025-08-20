@@ -78,19 +78,26 @@ app.get('/edit/:id', async (req, res) => {
     }
 })
 
-app.get('/login', (req, res) => {
-    return res.render('login')
-})
-
 app.post('/savepost/:id', async (req, res) => {
     const id = req.params.id
     const { title, content } = req.body
     try {
-        db.query(`UPDATE posts SET title = '${title}', content = '${content}' WHERE id = ${id};`)
+        db.query(`UPDATE posts SET title = $1, content = $2 WHERE id = $3;`,
+            [title, content, id]
+        )
     } catch (e) {
-        console.error(e)
+        console.error('db update error ', e)
+        res.status(500).send('Server error updating database.')
     }
     res.redirect(`/post/${id}`)
+})
+
+app.get('/login', (req, res) => {
+    return res.render('login')
+})
+
+app.post('/login', (req, res) => {
+    return res.send('200')
 })
 
 app.listen(PORT, () => {

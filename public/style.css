@@ -69,7 +69,7 @@ input:focus, textarea:focus {
     overflow: hidden;
 }    
 
-.edit_button {
+button, .edit_button {
     background-color: #321030;
     border-color: #c88cb6;
     border-radius: 0.2rem;

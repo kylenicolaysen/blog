@@ -2,6 +2,7 @@ const express = require('express')
 const hbs = require('express-handlebars')
 const db = require('./db')
 const path = require('path')
+const { title } = require('process')
 
 const app = express()
 const PORT = 3000
@@ -13,7 +14,7 @@ app.set('views', path.join(__dirname, 'views'))
 app.use(express.static(path.join(__dirname, 'public')))
 app.use(express.urlencoded({ extended: true }))
 
-// list all posts
+// list all posts page
 app.get('/', async (req, res) => {
     try{
         const db_result = await db.query('SELECT id, title, content FROM posts ORDER BY created_at DESC')
@@ -29,34 +30,37 @@ app.get('/', async (req, res) => {
     }
 })
 
-// single post
+// display single post page
 app.get('/post/:id', async (req, res) => {
     try {
-        const db_result = await db.query(`SELECT * FROM posts WHERE id = ${req.params.id};`)
+        const db_result = await db.query(`SELECT * FROM posts WHERE id = '${req.params.id}';`)
         const post = db_result.rows[0]
         if (!post) {
             return res.status(404).send('Post not found')
         }
         //Need to change this to auth middleware result
         let logged_in = true
+        content = post.content.replace(/\n/g, '<br>')
         res.render('post', {
             id: post.id,
             title: post.title,
-            content: post.content,
+            content: content,
             date: post.created_at,
             logged_in
         })
     } catch (err) {
+        console.log(err)
         res.status(500).send('Error loading post.')
     }
 })
 
+// edit post page
 app.get('/edit/:id', async (req, res) => {
     try {
         //Need to change this to auth middleware result
         let logged_in = true
         if (logged_in == true) {
-            const db_result = await db.query(`SELECT * FROM posts WHERE id = ${req.params.id};`)
+            const db_result = await db.query(`SELECT * FROM posts WHERE id = '${req.params.id}';`)
             const post = db_result.rows[0]
             if (!post) {
                 return res.status(404).send('Post not found.')
@@ -78,6 +82,7 @@ app.get('/edit/:id', async (req, res) => {
     }
 })
 
+// edit post action
 app.post('/savepost/:id', async (req, res) => {
     const id = req.params.id
     const { title, content } = req.body
@@ -92,11 +97,37 @@ app.post('/savepost/:id', async (req, res) => {
     res.redirect(`/post/${id}`)
 })
 
+//add post page
+app.get('/add', (req, res) => {
+    res.render('add')
+})
+
+//add post action
+app.post('/addpost', async (req, res) => {
+    try {
+        db.query('INSERT INTO posts () VALUES ();')
+    } catch (e) {
+        console.error(e)
+    }
+})
+
+//login page
 app.get('/login', (req, res) => {
     return res.render('login')
 })
 
+//login action
 app.post('/login', (req, res) => {
+    return res.send('200')
+})
+
+//signup page
+app.get('/signup', (req, res) => {
+    return res.render('signup')
+})
+
+//signup action
+app.post('/signup', (req, res) => {
     return res.send('200')
 })
 

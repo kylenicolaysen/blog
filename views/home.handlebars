@@ -1,11 +1,14 @@
-{{!-- <h1>Kyle Learns A Lot</h1>
-<p>A blog to document my journey through various hobby projects, including this site.</p> --}}
-<ul>
-  {{#each posts}}
-    <li>
-      <a href="/post/{{id}}"><h2>{{title}}</h2><p>_{{preview}}</p></a>
-    </li>
-  {{/each}}
-</ul>
+<div class="post-content">
+    <ul>
+    {{#each posts}}
+        <li>
+        <a href="/post/{{id}}"><h2>{{title}}</h2><p>_{{preview}}</p></a>
+        </li>
+    {{/each}}
+    </ul>
+</div>
 
-<a href="/login"><button>Login</button></a>
+<div class="footer">
+    <a class="footer_button" href="/add">_Add</a>
+    <a class="footer_button" href="/login">_Login</a>
+</div>

@@ -1,13 +1,14 @@
-<p>editing post...</p>
+<p>adding new post...</p>
 <div class="post-content">
 <form id="edit_form" method="POST" action="/savepost/{{id}}">
-    <label><input type="text" name="title" id="title_input" value="{{title}}"></label>
-    <label><textarea type="text" name="content" id="content_input" rows="auto">{{content}}"</textarea></label>
+    <label><input type="text" name="title" id="title_input" placeholder="Title"></label>
+    <label><textarea type="text" name="content" id="content_input" rows="auto" placeholder="Type out some content. Make it real insightful."></textarea></label>
     <button type="submit" id="save_button" class="edit_button">Save</button>
 </form>
 
-<a href="/post/{{id}}"><button id="cancel_button" class="edit_button">Cancel</button></a>
+<a href="/"><button id="cancel_button" class="edit_button">Cancel</button></a>
 </div>
+
 <div class="footer">
     <a class="footer_button" href="/">_Home</a>
     <a class="footer_button" href="/logout">_Logout</a>

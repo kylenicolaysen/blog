@@ -1,9 +1,10 @@
 <h1>{{title}}</h1>
-<p class="content">{{content}}</p>
+<div class="post-content">{{{content}}}</div>
 <div class="footer">
     <a class="footer_button" href="/">_Home</a>
     {{#if logged_in}}
         <a class="footer_button" href="/edit/{{id}}">_Edit Post</a>
+        <a class="footer_button" href="/logout">_Logout</a>
     {{else}}
         <a class="footer_button" href="/login">_Login</a>
     {{/if}}

@@ -7,6 +7,7 @@
 
 html {
     font-size: 16px;
+    height: 100%;
 }
 
 img {
@@ -22,6 +23,8 @@ body {
     background-color: #321030;
     color: #c88cb6;
     padding: 2rem;
+    display: flex;
+    flex-direction: column;
 }
 
 h1 {
@@ -42,7 +45,10 @@ input, textarea {
     border-style: groove;
     background-color: #321030;
     color: #c88cb6;
-    border-style: none;
+    border-style: line;
+    border-radius: .2rem;
+    border-color: #efc5e3;
+    border-width: 1px;
     padding: .2rem;
 }
 
@@ -78,8 +84,10 @@ button, .edit_button {
     color: #c88cb6;
 }
 
-.content {
+.post-content {
     padding: .2rem;
+    flex: 1;
+    flex-grow: 1;
 }
 
 .header {
@@ -87,11 +95,17 @@ button, .edit_button {
 }
 
 .footer {
-    position: fixed;
+    /* position: fixed; */
     bottom: 2rem;
     width: 100%;
 }
 
 .footer_button {
     display: block;
+}
+
+.site-wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Make the wrapper at least the full viewport height */
 }

@@ -1,10 +1,15 @@
 <div class="post-content">
-    <form id="login_form" method="POST" actions="/login">
-        <label>email<input type="text"></label>
-        <label>password<input type="text"></label>
-        <button>login</button>
+    <form id="login_form" method="POST" action="/login" class="auth_form">
+        <label>
+            email
+            <input id="email_input" type="email" required>
+        </label>
+        <label>
+            password
+            <input id="password_input" type="password" required>
+        </label>
+        <button id="login_button" type="submit">login</button>
     </form>
-
 </div>
 
 <div class="footer">

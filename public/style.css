@@ -10,15 +10,6 @@ html {
     height: 100%;
 }
 
-img {
-    max-width: 50px;
-    max-height: 50px;
-}
-
-hr {
-    color: #c88cb6;
-}
-
 body {
     background-color: #321030;
     color: #c88cb6;
@@ -40,6 +31,15 @@ ul {
     list-style-type: none;
 }
 
+img {
+    max-width: 50px;
+    max-height: 50px;
+}
+
+hr {
+    color: #c88cb6;
+}
+
 input, textarea {
     width: 100%;
     border-style: groove;
@@ -55,6 +55,26 @@ input, textarea {
 input:focus, textarea:focus {
     border-radius: .3rem;
     border-color: #c88cb6;
+}
+
+.header {
+    margin-bottom: 2rem;
+}
+
+.site-wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Make the wrapper at least the full viewport height */
+}
+
+.post-content {
+    padding: .2rem;
+    flex: 1;
+    flex-grow: 1;
+}
+
+.auth_form {
+    width: 15rem;
 }
 
 #title_input {
@@ -84,28 +104,11 @@ button, .edit_button {
     color: #c88cb6;
 }
 
-.post-content {
-    padding: .2rem;
-    flex: 1;
-    flex-grow: 1;
-}
-
-.header {
-    margin-bottom: 2rem;
-}
-
 .footer {
-    /* position: fixed; */
     bottom: 2rem;
     width: 100%;
 }
 
 .footer_button {
     display: block;
-}
-
-.site-wrapper {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh; /* Make the wrapper at least the full viewport height */
 }

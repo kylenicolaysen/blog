@@ -1,13 +1,39 @@
 <div class="post-content">
-    <form id="signup_form" method="POST" actions="/signup">
-        <label>email<input type="text"></label>
-        <label>password<input type="text"></label>
-        <label>confirm password<input type="text"></label>
-        <button>signup</button>
+    <form id="signup_form" method="POST" action="/signup" class="auth_form">
+        <label>
+            email
+            <input id="email_input" type="email" required>
+        </label>
+        <label>
+            password
+            <input id="password_input" type="password" required>
+        </label>
+        <label>
+            confirm password
+            <input id="password2_input" type="password" required>
+        </label>
+        <p id="form_error" class="form_error"></p>
+        <button id="signup_button" type="submit">signup</button>
     </form>
-
 </div>
 
 <div class="footer">
     <a class="footer_button" href="/">_Home</a>
+    <a class="footer_button" href="/login">_Login</a>
 </div>
+
+<script>
+    document.getElementById('signup_form').addEventListener('submit', function (e) {
+        const password  = document.getElementById('password_input').value
+        const password2 = document.getElementById('password2_input').value
+        const errorEl   = document.getElementById('form_error')
+
+        if (password !== password2) {
+            e.preventDefault()
+            errorEl.textContent = "Passwords do not match."
+            errorEl.style.color = "red"
+        } else {
+            errorEl.textContent = ""
+        }
+    })
+</script>

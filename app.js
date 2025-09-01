@@ -104,11 +104,16 @@ app.get('/add', (req, res) => {
 
 //add post action
 app.post('/addpost', async (req, res) => {
+    const { title, content } = req.body
     try {
-        db.query('INSERT INTO posts () VALUES ();')
+        db.query(`INSERT INTO posts (title, content) VALUES ($1, $2);`,
+            [title, content]
+        )
     } catch (e) {
-        console.error(e)
+        console.error('db add error ', e)
+        res.status(500).send('Server error updating database.')
     }
+    res.redirect('/')
 })
 
 //login page
@@ -118,7 +123,15 @@ app.get('/login', (req, res) => {
 
 //login action
 app.post('/login', (req, res) => {
-    return res.send('200')
+    const { email, password } = req.body
+    try {
+        // db.query('SELECT * FROM users WHERE email = email;', 
+        //     []
+        // )
+    } catch (e) {
+
+    }
+    res.redirect('/')
 })
 
 //signup page
@@ -128,6 +141,16 @@ app.get('/signup', (req, res) => {
 
 //signup action
 app.post('/signup', (req, res) => {
+    const { email, password } = req.body
+    try {
+        db.query(`INSERT INTO users (email, password) VALUES ($1, $2);`,
+            [title, content]
+        )
+    } catch (e) {
+        console.error('db add error ', e)
+        res.status(500).send('Server error updating database.')
+    }
+    res.redirect('/')
     return res.send('200')
 })
 

@@ -124,21 +124,23 @@ app.get('/login', (req, res) => {
 
 //login action
 app.post('/login', async (req, res) => {
-    const { email, password } = req.body
-    
-    // MAKE THIS FUNCTION WORK!!
-
-    // // Load hash from your password DB.
-    // bcrypt.compare(myPlaintextPassword, hash, function(err, result) {
-    //     // result == true
-    // });
+    let { email, password } = req.body
     try {
-        // db.query('SELECT * FROM users WHERE email = email;', 
-        //     []
-        // )
+        db_result = await db.query(`SELECT * FROM users WHERE email = '${email}';`)
+        if (!db_result.rows[0]) {
+            throw new Error('Login Error: Email not found.')
+        }
+        email = db_result.rows[0].email
+        hash = db_result.rows[0].password
+        bcrypt.compare(password, hash, (err, response) => {
+            console.log(response)
+            //THIS IS WHERE WE NEED TO CREATE A SESSION
+            //AND RETURN IT TO THE CLIENT
+        })
     } catch (e) {
-
-    }
+        console.error('email match error ', e)
+        res.status(401).send('Email does not match')
+    }    
     res.redirect('/')
 })
 
@@ -150,14 +152,11 @@ app.get('/signup', (req, res) => {
 //signup action
 app.post('/signup', async (req, res) => {
     const { email, password } = req.body
-    console.log('email: ', email, ' password: ', password)
-    let encrypted_password = ''
+    let encrypted_password
     const pepper = process.env.PEPPER
-    console.log(pepper)
     if (!pepper) {
         throw new Error('pepper env variable not found')
     }
-    
     try {
         bcrypt.hash(password + pepper, saltRounds, function(err, hash) {
             encrypted_password = hash

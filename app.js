@@ -2,10 +2,11 @@ const express = require('express')
 const hbs = require('express-handlebars')
 const db = require('./db')
 const path = require('path')
-const { title } = require('process')
+const bcrypt = require('bcrypt')
 
 const app = express()
 const PORT = 3000
+const saltRounds = 10;
 
 app.engine('handlebars', hbs.engine())
 app.set('view engine', 'handlebars')
@@ -122,8 +123,15 @@ app.get('/login', (req, res) => {
 })
 
 //login action
-app.post('/login', (req, res) => {
+app.post('/login', async (req, res) => {
     const { email, password } = req.body
+    
+    // MAKE THIS FUNCTION WORK!!
+
+    // // Load hash from your password DB.
+    // bcrypt.compare(myPlaintextPassword, hash, function(err, result) {
+    //     // result == true
+    // });
     try {
         // db.query('SELECT * FROM users WHERE email = email;', 
         //     []
@@ -140,11 +148,22 @@ app.get('/signup', (req, res) => {
 })
 
 //signup action
-app.post('/signup', (req, res) => {
+app.post('/signup', async (req, res) => {
     const { email, password } = req.body
+    console.log('email: ', email, ' password: ', password)
+    let encrypted_password = ''
+    const pepper = process.env.PEPPER
+    console.log(pepper)
+    if (!pepper) {
+        throw new Error('pepper env variable not found')
+    }
+    
     try {
+        bcrypt.hash(password + pepper, saltRounds, function(err, hash) {
+            encrypted_password = hash
+        })
         db.query(`INSERT INTO users (email, password) VALUES ($1, $2);`,
-            [title, content]
+            [email, encrypted_password]
         )
     } catch (e) {
         console.error('db add error ', e)

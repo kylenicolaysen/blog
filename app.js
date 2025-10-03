@@ -3,6 +3,9 @@ const hbs = require('express-handlebars')
 const db = require('./db')
 const path = require('path')
 const bcrypt = require('bcrypt')
+const session = require('express-session')
+
+const requireLogin = require('./auth')
 
 const app = express()
 const PORT = 3000
@@ -14,6 +17,12 @@ app.set('views', path.join(__dirname, 'views'))
 
 app.use(express.static(path.join(__dirname, 'public')))
 app.use(express.urlencoded({ extended: true }))
+app.use(session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie:{ secure: false } //change to true for https
+}))
 
 // list all posts page
 app.get('/', async (req, res) => {
@@ -24,7 +33,8 @@ app.get('/', async (req, res) => {
             title: post.title,
             preview: post.content.split(' ').slice(0, 10).join(' ') + '...',
         }))
-        res.render('home', { posts })
+        const logged_in = !!req.session.userId
+        res.render('home', { posts, logged_in })
     } catch (err) {
         console.log(err)
         res.status(500).send('Error loading posts.')
@@ -39,8 +49,7 @@ app.get('/post/:id', async (req, res) => {
         if (!post) {
             return res.status(404).send('Post not found')
         }
-        //Need to change this to auth middleware result
-        let logged_in = true
+        const logged_in = !!req.session.userId
         content = post.content.replace(/\n/g, '<br>')
         res.render('post', {
             id: post.id,
@@ -56,7 +65,7 @@ app.get('/post/:id', async (req, res) => {
 })
 
 // edit post page
-app.get('/edit/:id', async (req, res) => {
+app.get('/edit/:id', requireLogin, async (req, res) => {
     try {
         //Need to change this to auth middleware result
         let logged_in = true
@@ -99,7 +108,7 @@ app.post('/savepost/:id', async (req, res) => {
 })
 
 //add post page
-app.get('/add', (req, res) => {
+app.get('/add', requireLogin, (req, res) => {
     res.render('add')
 })
 
@@ -112,6 +121,17 @@ app.post('/addpost', async (req, res) => {
         )
     } catch (e) {
         console.error('db add error ', e)
+        res.status(500).send('Server error updating database.')
+    }
+    res.redirect('/')
+})
+
+//delete post action
+app.get('/delete/:id', async (req, res) => {
+    try {
+        db.query(`DELETE FROM posts WHERE id = '${req.params.id}';`)
+    } catch (e) {
+        console.error('db delete error ', e)
         res.status(500).send('Server error updating database.')
     }
     res.redirect('/')
@@ -134,14 +154,14 @@ app.post('/login', async (req, res) => {
         hash = db_result.rows[0].password
         bcrypt.compare(password, hash, (err, response) => {
             console.log(response)
-            //THIS IS WHERE WE NEED TO CREATE A SESSION
-            //AND RETURN IT TO THE CLIENT
+            req.session.userId = db_result.rows[0].id
+            res.redirect('/')
         })
     } catch (e) {
         console.error('email match error ', e)
         res.status(401).send('Email does not match')
     }    
-    res.redirect('/')
+    
 })
 
 //signup page
@@ -152,24 +172,31 @@ app.get('/signup', (req, res) => {
 //signup action
 app.post('/signup', async (req, res) => {
     const { email, password } = req.body
-    let encrypted_password
+    let encrypted_password = 'placeholder   '
     const pepper = process.env.PEPPER
     if (!pepper) {
         throw new Error('pepper env variable not found')
     }
     try {
-        bcrypt.hash(password + pepper, saltRounds, function(err, hash) {
-            encrypted_password = hash
-        })
-        db.query(`INSERT INTO users (email, password) VALUES ($1, $2);`,
+        encrypted_password = await bcrypt.hash(password + pepper, saltRounds)
+        console.log('should also be after hash',encrypted_password)
+        result = await db.query(`INSERT INTO users (email, password) VALUES ($1, $2);`,
             [email, encrypted_password]
         )
+        req.session.userId = result.rows[0].id
+        res.redirect('/')
+        return res.send('200')
     } catch (e) {
         console.error('db add error ', e)
         res.status(500).send('Server error updating database.')
     }
-    res.redirect('/')
-    return res.send('200')
+})
+
+//logout action
+app.get('/logout', (req, res) => {
+    req.session.destroy(() => {
+        res.redirect('/')
+    })
 })
 
 app.listen(PORT, () => {

@@ -10,8 +10,6 @@ const requireLogin = require('./auth')
 const app = express()
 const PORT = 3000
 const saltRounds = 10;
-const sessionSecret = process.env.SESSION_SECRET
-console.log(sessionSecret)
 
 app.engine('handlebars', hbs.engine())
 app.set('view engine', 'handlebars')
@@ -20,7 +18,7 @@ app.set('views', path.join(__dirname, 'views'))
 app.use(express.static(path.join(__dirname, 'public')))
 app.use(express.urlencoded({ extended: true }))
 app.use(session({
-    secret: sessionSecret,
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     cookie:{ secure: false } //change to true for https
@@ -174,20 +172,18 @@ app.get('/signup', (req, res) => {
 //signup action
 app.post('/signup', async (req, res) => {
     const { email, password } = req.body
-    let encrypted_password = 'placeholder   '
+    let encrypted_password 
     const pepper = process.env.PEPPER
     if (!pepper) {
         throw new Error('pepper env variable not found')
     }
     try {
         encrypted_password = await bcrypt.hash(password + pepper, saltRounds)
-        console.log('should also be after hash',encrypted_password)
-        result = await db.query(`INSERT INTO users (email, password) VALUES ($1, $2);`,
+        const result = await db.query(`INSERT INTO users (email, password) VALUES ($1, $2) RETURNING id;`,
             [email, encrypted_password]
         )
         req.session.userId = result.rows[0].id
-        res.redirect('/')
-        return res.send('200')
+        return res.status(200).redirect('/')
     } catch (e) {
         console.error('db add error ', e)
         res.status(500).send('Server error updating database.')

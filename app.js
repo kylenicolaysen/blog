@@ -10,6 +10,8 @@ const requireLogin = require('./auth')
 const app = express()
 const PORT = 3000
 const saltRounds = 10;
+const sessionSecret = process.env.SESSION_SECRET
+console.log(sessionSecret)
 
 app.engine('handlebars', hbs.engine())
 app.set('view engine', 'handlebars')
@@ -18,7 +20,7 @@ app.set('views', path.join(__dirname, 'views'))
 app.use(express.static(path.join(__dirname, 'public')))
 app.use(express.urlencoded({ extended: true }))
 app.use(session({
-    secret: process.env.SESSION_SECRET,
+    secret: sessionSecret,
     resave: false,
     saveUninitialized: false,
     cookie:{ secure: false } //change to true for https
